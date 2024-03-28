@@ -478,7 +478,7 @@ class File(models.Model):
             else:
                 storage_label = selection.get(storage_type)
                 file_label = selection.get(record.save_type)
-                record.migration = "{} > {}".format(file_label, storage_label)
+                record.migration = f"{file_label} > {storage_label}"
                 record.require_migration = True
 
     # ----------------------------------------------------------

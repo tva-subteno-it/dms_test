@@ -121,8 +121,7 @@ class DmsAccessGroups(models.Model):
         for one in self:
             one.update(
                 {
-                    "perm_inclusive_%s"
-                    % perm: (
+                    "perm_inclusive_%s" % perm: (
                         one["perm_%s" % perm]
                         or one.parent_group_id["perm_inclusive_%s" % perm]
                     )

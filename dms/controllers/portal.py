@@ -91,7 +91,7 @@ class CustomerPortal(CustomerPortal):
         search=None,
         search_in="name",
         access_token=None,
-        **kw
+        **kw,
     ):
         ensure_db()
         # operations

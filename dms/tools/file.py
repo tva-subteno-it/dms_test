@@ -14,7 +14,7 @@ def check_name(name):
     tmp_dir = tempfile.mkdtemp()
     try:
         open(os.path.join(tmp_dir, name), "a").close()
-    except IOError:
+    except OSError:
         return False
     finally:
         shutil.rmtree(tmp_dir)
@@ -24,9 +24,9 @@ def check_name(name):
 def compute_name(name, suffix, escape_suffix):
     if escape_suffix:
         name, extension = os.path.splitext(name)
-        return "{}({}){}".format(name, suffix, extension)
+        return f"{name}({suffix}){extension}"
     else:
-        return "{}({})".format(name, suffix)
+        return f"{name}({suffix})"
 
 
 def unique_name(name, names, escape_suffix=False):

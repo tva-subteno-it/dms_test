@@ -9,7 +9,6 @@ from odoo.modules.module import get_resource_path
 
 
 class Thumbnail(models.AbstractModel):
-
     _name = "dms.mixins.thumbnail"
     _inherit = "image.mixin"
     _description = "DMS thumbnail and icon mixin"
@@ -38,7 +37,7 @@ class Thumbnail(models.AbstractModel):
         for one in self:
             # Get URL to thumbnail or to the default icon by file extension
             one.icon_url = (
-                "/web/image/{}/{}/image_128/128x128?crop=1".format(one._name, one.id)
+                f"/web/image/{one._name}/{one.id}/image_128/128x128?crop=1"
                 if one.image_128
                 else one._get_icon_url()
             )

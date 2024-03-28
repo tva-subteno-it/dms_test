@@ -12,7 +12,6 @@ _logger = logging.getLogger(__name__)
 
 
 class Storage(models.Model):
-
     _name = "dms.storage"
     _description = "Storage"
 

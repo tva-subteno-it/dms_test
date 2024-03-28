@@ -60,7 +60,7 @@ class DmsSecurityMixin(models.AbstractModel):
         for record in self:
             record.record_ref = False
             if record.res_model and record.res_id:
-                record.record_ref = "{},{}".format(record.res_model, record.res_id)
+                record.record_ref = f"{record.res_model},{record.res_id}"
 
     def _compute_permissions(self):
         """Get permissions for the current record.
@@ -100,10 +100,7 @@ class DmsSecurityMixin(models.AbstractModel):
             return []
         inherited_access_field = "storage_id_inherit_access_from_parent_record"
         if self._name != "dms.directory":
-            inherited_access_field = "{}.{}".format(
-                self._directory_field,
-                inherited_access_field,
-            )
+            inherited_access_field = f"{self._directory_field}.{inherited_access_field}"
         inherited_access_domain = [
             ("storage_id_save_type", "=", "attachment"),
             (inherited_access_field, "=", True),
@@ -153,7 +150,7 @@ class DmsSecurityMixin(models.AbstractModel):
             "unlink": "AND dag.perm_inclusive_unlink",
             "write": "AND dag.perm_inclusive_write",
         }[operation]
-        select = """
+        select = f"""
             SELECT
                 dir_group_rel.aid
             FROM
@@ -163,10 +160,8 @@ class DmsSecurityMixin(models.AbstractModel):
                 INNER JOIN dms_access_group_users_rel AS users
                     ON users.gid = dag.id
             WHERE
-                users.uid = %s {}
-            """.format(
-            operation_check
-        )
+                users.uid = %s {operation_check}
+            """
         return (select, (self.env.uid,))
 
     @api.model
