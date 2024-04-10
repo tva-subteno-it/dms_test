@@ -12,13 +12,13 @@
         <field name="view_mode">kanban,tree,form</field>
         <field name="domain">
             [
-            ("storage_id", "=", active_id),
+            ("storage_id", "=", id),
             ("is_hidden", "=", False),
             ]
         </field>
         <field name="context">
             {
-            'default_storage_id': active_id,
+            'default_storage_id': id,
             'default_is_root_directory': True,
             }
         </field>
@@ -38,7 +38,7 @@
         <field name="view_mode">kanban,tree,graph,pivot,form</field>
         <field name="domain">
             [
-            ("storage_id", "=", active_id),
+            ("storage_id", "=", id),
             ("is_hidden", "=", False),
             ]
         </field>
@@ -58,7 +58,7 @@
         <field name="search_view_id" ref="search_dms_file_migration" />
         <field name="domain">
             [
-            ("storage_id", "=", active_id),
+            ("storage_id", "=", id),
             ("require_migration", "=", True),
             "|",("active", "=", False), ("active", "!=", False)
             ]
@@ -115,7 +115,7 @@
                         name="action_storage_migrate"
                         type="object"
                         string="Migrate Files"
-                        attrs="{'invisible': [('save_type', '=', 'attachment')]}"
+                        invisible="save_type == 'attachment'"
                     />
                     <button
                         type="action"
@@ -169,18 +169,18 @@
                             <field name="is_hidden" />
                             <field
                                 name="inherit_access_from_parent_record"
-                                attrs="{'invisible': [('save_type', '!=', 'attachment')]}"
+                                invisible="save_type != 'attachment'"
                             />
                             <field
                                 name="include_message_attachments"
-                                attrs="{'invisible': [('save_type', '!=', 'attachment')]}"
+                                invisible="save_type != 'attachment'"
                             />
                         </group>
                         <group>
                             <field name="company_id" />
                             <field
                                 name="model_ids"
-                                attrs="{'invisible': [('save_type', '!=', 'attachment')]}"
+                                invisible="save_type != 'attachment'"
                             />
                         </group>
                     </group>
@@ -188,12 +188,12 @@
                         <page
                             name="page_roots"
                             string="Root Directories"
-                            attrs="{'invisible': [('id', '=', False)]}"
+                            invisible="not id"
                         >
                             <field
                                 name="root_directory_ids"
                                 groups="dms.group_dms_manager"
-                                context="{'hide_root_storage': True,'default_storage_id': active_id, 'default_is_root_directory': True}"
+                                context="{'hide_root_storage': True,'default_storage_id': id, 'default_is_root_directory': True}"
                             >
                                 <tree>
                                     <field name="name" />
@@ -221,13 +221,6 @@
             </p>
         </field>
     </record>
-    <menuitem
-        id="menu_dms_storage"
-        name="Storages"
-        parent="cat_menu_dms_config_system"
-        action="action_dms_storage"
-        sequence="5"
-    />
     <record id="view_dms_storage_new_form" model="ir.ui.view">
         <field name="name">dms_storage.form</field>
         <field name="model">dms.storage</field>

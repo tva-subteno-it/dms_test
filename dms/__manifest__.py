@@ -4,7 +4,7 @@
 {
     "name": "Document Management System",
     "summary": """Document Management System for Odoo""",
-    "version": "16.0.1.4.0",
+    "version": "17.0.1.0.0",
     "category": "Document Management",
     "license": "LGPL-3",
     "website": "https://github.com/OCA/dms",
@@ -12,32 +12,42 @@
     "depends": [
         "mail",
         "http_routing",
+        "onboarding",
         "portal",
         "base",
+        "web",
     ],
     "data": [
+
+        # Security
         "security/security.xml",
         "security/ir.model.access.csv",
+
+        # Actions
         "actions/file.xml",
-        "template/onboarding.xml",
-        "views/menu.xml",
+
+        # Templates
+
+        # Data
+        "data/onboarding_data.xml",
+
+        # Views
         "views/tag.xml",
-        "views/category.xml",
+        "views/dms_category.xml",
         "views/dms_file.xml",
-        "views/directory.xml",
+        "views/dms_directory.xml",
         "views/storage.xml",
         "views/dms_access_groups_views.xml",
         "views/res_config_settings.xml",
         "views/dms_portal_templates.xml",
+        "views/menu.xml",
     ],
     "assets": {
-        "mail.assets_messaging": [
-            ("include", "mail.assets_core_messaging"),
-            "dms/static/src/models/*.js",
-        ],
         "web.assets_backend": [
             "dms/static/src/scss/*",
-            "dms/static/src/js/fields/*",
+            "dms/static/src/models/*.js",
+            "dms/static/src/js/fields/*.esm.js",
+            "dms/static/src/js/fields/*.xml",
             "dms/static/src/js/views/*.esm.js",
             "dms/static/src/js/views/*.xml",
             "dms/static/src/js/views/fields/binary/*",
@@ -53,6 +63,6 @@
         "demo/directory.xml",
         "demo/file.xml",
     ],
-    "images": ["static/description/banner.png"],
+    "images": ["static/description/icon.png"],
     "application": True,
 }

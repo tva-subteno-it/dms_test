@@ -1,10 +1,16 @@
 /** @odoo-module **/
 
 import {registry} from "@web/core/registry";
+import {standardFieldProps} from "@web/views/fields/standard_field_props";
 import {Component, onWillUpdateProps} from "@odoo/owl";
 import {useService} from "@web/core/utils/hooks";
 
 class DmsPathField extends Component {
+    static template = "dms.DmsPathField";
+    static props = {
+        ...standardFieldProps,
+    };
+
     setup() {
         super.setup();
         this.action = useService("action");
@@ -13,7 +19,7 @@ class DmsPathField extends Component {
     }
 
     formatData(props) {
-        this.data = JSON.parse(props.value || "[]");
+        this.data = JSON.parse(props.record.data?.path_json || "[]");
     }
 
     _onNodeClicked(event) {
@@ -29,6 +35,13 @@ class DmsPathField extends Component {
     }
 }
 
-DmsPathField.supportedTypes = ["text"];
-DmsPathField.template = "dms.DmsPathField";
-registry.category("fields").add("path_json", DmsPathField);
+const dmsPathField = {
+    component: DmsPathField,
+    display_name: "Dms Path Field",
+    supportedTypes: ["text"],
+    extractProps: () => {
+        return {};
+    },
+};
+
+registry.category("fields").add("path_json", dmsPathField);

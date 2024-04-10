@@ -1,12 +1,15 @@
 /** @odoo-module **/
 
-import {registerPatch} from "@mail/model/model_core";
+// import {registerPatch} from "@mail/model/model_core";
 
-registerPatch({
-    name: "AttachmentViewerViewable",
-    fields: {
-        imageUrl: {
-            compute() {
+import {patch} from "@web/core/utils/patch";
+import {LinkPreview} from "@mail/core/common/link_preview";
+
+patch(
+    LinkPreview,
+    {
+        get imageUrl() {
+            return function compute() {
                 if (
                     !this.attachmentOwner.accessToken &&
                     this.attachmentOwner.originThread &&
@@ -24,7 +27,7 @@ registerPatch({
                     return `/web/content?id=${this.attachmentOwner.id}&field=content&model=dms.file&filename_field=name&download=false`;
                 }
                 return `/web/image/${this.attachmentOwner.id}${accessToken}`;
-            },
+            }
         },
     },
-});
+);

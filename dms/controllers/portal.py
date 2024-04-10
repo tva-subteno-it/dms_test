@@ -194,9 +194,9 @@ class CustomerPortal(CustomerPortal):
         ):
             dms_file_sudo = dms_file_sudo.sudo()
         filecontent = base64.b64decode(dms_file_sudo.content)
-        content_type = ["Content-Type", "application/octet-stream"]
-        disposition_content = [
+        content_type = ("Content-Type", "application/octet-stream")
+        disposition_content = (
             "Content-Disposition",
             content_disposition(dms_file_sudo.name),
-        ]
+        )
         return request.make_response(filecontent, [content_type, disposition_content])

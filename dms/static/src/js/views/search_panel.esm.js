@@ -3,17 +3,13 @@
  * License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). */
 
 import {SearchModel} from "@web/search/search_model";
-import {patch} from "@web/core/utils/patch";
+import {registry} from "@web/core/registry";
 
-patch(SearchModel.prototype, "dms.SearchPanel", {
-    setup() {
-        this._super(...arguments);
-    },
-
+class DMSSearchPanel extends SearchModel {
     _getCategoryDomain(excludedCategoryId) {
-        const domain = this._super.apply(this, arguments);
+        const domain = super._getCategoryDomain(...arguments);
         for (const category of this.categories) {
-            if (category.id === excludedCategoryId) {
+            if (category.id === Number(excludedCategoryId)) {
                 continue;
             }
 
@@ -25,5 +21,7 @@ patch(SearchModel.prototype, "dms.SearchPanel", {
             }
         }
         return domain;
-    },
-});
+    }
+}
+
+registry.category("views").add("dms_search_panel", DMSSearchPanel)

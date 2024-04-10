@@ -10,18 +10,18 @@ import {registry} from "@web/core/registry";
 import {patch} from "@web/core/utils/patch";
 import {kanbanView} from "@web/views/kanban/kanban_view";
 import {FileKanbanRenderer} from "./file_kanban_renderer.esm";
-import {FileKanbanController} from "./file_kanban_controller.esm";
+// import {FileKanbanController} from "./file_kanban_controller.esm";
+import {KanbanController} from "@web/views/kanban/kanban_controller";
 
-import {FileDropZone, FileUpload} from "./dms_file_upload.esm";
+import {createFileDropZoneExtension, createFileUploadExtension} from "./dms_file_upload.esm";
 
-patch(FileKanbanRenderer.prototype, "file_kanban_renderer_dzone", FileDropZone);
-patch(FileKanbanController.prototype, "filee_kanban_controller_upload", FileUpload);
+patch(FileKanbanRenderer.prototype, createFileDropZoneExtension());
+patch(KanbanController.prototype, createFileUploadExtension());
 FileKanbanRenderer.template = "dms.KanbanRenderer";
 
 export const FileKanbanView = {
     ...kanbanView,
     buttonTemplate: "dms.KanbanButtons",
-    Controller: FileKanbanController,
     Renderer: FileKanbanRenderer,
 };
 

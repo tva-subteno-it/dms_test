@@ -2,6 +2,7 @@
 
 import {KanbanRecord} from "@web/views/kanban/kanban_record";
 import {useService} from "@web/core/utils/hooks";
+import {useFileViewer} from "@web/core/file_viewer/file_viewer_hook";
 
 const videoReadableTypes = ["x-matroska", "mp4", "webm"];
 const audioReadableTypes = ["mp3", "ogg", "wav", "aac", "mpa", "flac", "m4a"];
@@ -9,8 +10,8 @@ const audioReadableTypes = ["mp3", "ogg", "wav", "aac", "mpa", "flac", "m4a"];
 export class FileKanbanRecord extends KanbanRecord {
     setup() {
         super.setup();
-        this.messaging = useService("messaging");
-        this.dialog = useService("dialog");
+        this.store = useService("mail.store");
+        this.fileViewer = useFileViewer();
     }
 
     isVideo(mimetype) {
@@ -30,33 +31,27 @@ export class FileKanbanRecord extends KanbanRecord {
         const self = this;
 
         if (ev.target.closest(".o_kanban_dms_file_preview")) {
-            this.messaging.get().then((messaging) => {
-                const file_type = self.props.record.data.name.split(".")[1];
-                let mimetype = "";
+            const file_type = self.props.record.data.name.split(".")[1];
+            let mimetype;
 
-                if (self.isVideo(file_type)) {
-                    mimetype = `video/${file_type}`;
-                } else if (self.isAudio(file_type)) {
-                    mimetype = "audio/mpeg";
-                } else {
-                    mimetype = self.props.record.data.mimetype;
-                }
+            if (self.isVideo(file_type)) {
+                mimetype = `video/${file_type}`;
+            } else if (self.isAudio(file_type)) {
+                mimetype = "audio/mpeg";
+            } else {
+                mimetype = self.props.record.data.mimetype;
+            }
 
-                const attachmentList = messaging.models.AttachmentList.insert({
-                    selectedAttachment: messaging.models.Attachment.insert({
-                        id: self.props.record.data.id,
-                        filename: self.props.record.data.name,
-                        name: self.props.record.data.name,
-                        mimetype: mimetype,
-                        model_name: self.props.record.resModel,
-                    }),
-                });
-                this.dialog = messaging.models.Dialog.insert({
-                    attachmentListOwnerAsAttachmentView: attachmentList,
-                });
-            });
+            const attachment = this.store.Attachment.insert({
+                    id: self.props.record.data.id,
+                    filename: self.props.record.data.name,
+                    name: self.props.record.data.name,
+                    mimetype: mimetype,
+                    model_name: self.props.record.resModel,
+                })
+            this.fileViewer.open(attachment)
             return;
         }
-        return super.onGlobalClick(...arguments);
+        return super.onGlobalClick(ev);
     }
 }

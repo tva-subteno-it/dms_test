@@ -190,10 +190,11 @@ class DirectoryTestCaseBase(StorageDatabaseBaseCase):
 
 
 class DirectoryMailTestCase(StorageDatabaseBaseCase):
-    def setUp(self):
-        super().setUp()
-        self.params = self.env["ir.config_parameter"].sudo()
-        self.params.set_param("mail.catchall.domain", "mydomain.com")
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.params = cls.env["ir.config_parameter"].sudo()
+        cls.params.set_param("mail.catchall.domain", "mydomain.com")
 
     @mute_logger("odoo.addons.mail.mail_thread")
     def test_mail_alias_files(self):

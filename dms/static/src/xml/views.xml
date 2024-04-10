@@ -13,7 +13,7 @@
         <t t-jquery=".o_viewer_zoomer" t-operation="replace">
             <div class="o_viewer_zoomer">
                 <div
-                    t-if="widget.activeAttachment.fileType == 'image'"
+                    t-if="widget.activeAttachment.fileType === 'image'"
                     class="o_loading_img text-center"
                 >
                     <i
@@ -30,7 +30,7 @@
                     alt="Viewer"
                 />
                 <iframe
-                    t-if="widget.activeAttachment.fileType == 'application/pdf'"
+                    t-if="widget.activeAttachment.fileType === 'application/pdf'"
                     class="mt32 o_viewer_pdf"
                     t-attf-src="/web/static/lib/pdfjs/web/viewer.html?file=/web/content/#{model}/#{widget.activeAttachment.id}/#{widget.fieldName}"
                 />
@@ -40,7 +40,7 @@
                     t-attf-src="/web/content/#{model}/#{widget.activeAttachment.id}/#{widget.fieldName}"
                 />
                 <iframe
-                    t-if="widget.activeAttachment.fileType == 'youtu'"
+                    t-if="widget.activeAttachment.fileType === 'youtu'"
                     class="mt32 o_viewer_text"
                     allow="autoplay; encrypted-media"
                     width="560"
@@ -48,7 +48,7 @@
                     t-attf-src="https://www.youtube.com/embed/#{widget.activeAttachment.youtube}"
                 />
                 <video
-                    t-if="widget.activeAttachment.fileType == 'video'"
+                    t-if="widget.activeAttachment.fileType === 'video'"
                     class="o_viewer_video"
                     controls="controls"
                 >

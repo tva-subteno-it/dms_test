@@ -1,12 +1,14 @@
 /** @odoo-module **/
 
-import {registerPatch} from "@mail/model/model_core";
+// import {registerPatch} from "@mail/model/model_core";
+import {patch} from "@web/core/utils/patch";
+import {LinkPreview} from "@mail/core/common/link_preview";
 
-registerPatch({
-    name: "AttachmentImage",
-    fields: {
-        imageUrl: {
-            compute() {
+patch(
+    LinkPreview,
+    {
+        get imageUrl() {
+            return function compute() {
                 if (!this.attachment) {
                     return;
                 }
@@ -27,7 +29,7 @@ registerPatch({
                     return `/web/content?id=${this.attachment.id}&field=content&model=dms.file&filename_field=name&download=false`;
                 }
                 return `/web/image/${this.attachment.id}/${this.width}x${this.height}${accessToken}`;
-            },
+            }
         },
     },
-});
+);

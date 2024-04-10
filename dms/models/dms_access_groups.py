@@ -12,13 +12,26 @@ class DmsAccessGroups(models.Model):
     _parent_store = True
     _parent_name = "parent_group_id"
 
-    name = fields.Char(string="Group Name", required=True, translate=True)
-    parent_path = fields.Char(index="btree", unaccent=False)
+    name = fields.Char(
+        string="Group Name",
+        required=True,
+        translate=True
+    )
+    parent_path = fields.Char(
+        index="btree",
+        unaccent=False
+    )
 
     # Permissions written directly on this group
-    perm_create = fields.Boolean(string="Create Access")
-    perm_write = fields.Boolean(string="Write Access")
-    perm_unlink = fields.Boolean(string="Unlink Access")
+    perm_create = fields.Boolean(
+        string="Create Access"
+    )
+    perm_write = fields.Boolean(
+        string="Write Access"
+    )
+    perm_unlink = fields.Boolean(
+        string="Unlink Access"
+    )
 
     # Permissions computed including parent group
     perm_inclusive_create = fields.Boolean(
@@ -58,8 +71,13 @@ class DmsAccessGroups(models.Model):
         auto_join=True,
         readonly=True,
     )
-    count_users = fields.Integer(compute="_compute_users", store=True)
-    count_directories = fields.Integer(compute="_compute_count_directories")
+    count_users = fields.Integer(
+        compute="_compute_users",
+        store=True
+    )
+    count_directories = fields.Integer(
+        compute="_compute_count_directories"
+    )
     parent_group_id = fields.Many2one(
         comodel_name="dms.access.group",
         string="Parent Group",

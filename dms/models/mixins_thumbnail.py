@@ -5,7 +5,7 @@
 import os
 
 from odoo import api, fields, models
-from odoo.modules.module import get_resource_path
+from odoo.tools.misc import file_path
 
 
 class Thumbnail(models.AbstractModel):
@@ -17,10 +17,15 @@ class Thumbnail(models.AbstractModel):
 
     def _get_icon_disk_path(self):
         """Obtain local disk path to record icon."""
-        folders = ["static", "icons"]
         name = self._get_icon_placeholder_name()
-        path = get_resource_path("dms", *folders, name)
-        return path or get_resource_path("dms", *folders, "file_unknown.svg")
+        folders = ["dms", "static", "icons"]
+
+        try:
+            path = file_path(os.path.join(*folders, name))
+        except FileNotFoundError:
+            return file_path(os.path.join(*folders, "file_unknown.svg"))
+
+        return path or file_path(os.path.join(*folders, "file_unknown.svg"))
 
     def _get_icon_placeholder_name(self):
         return "folder.svg"

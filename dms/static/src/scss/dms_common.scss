@@ -1,0 +1,36 @@
+/**
+ * Copyright 2024 Subteno (https://www.subteno.com).
+ * License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl).
+ */
+
+.mk_directory_kanban_view, .mk_file_kanban_view {
+    .o_kanban_renderer {
+        .o_kanban_details {
+            position: relative;
+            height: 100%;
+        }
+
+        .o_kanban_record_bottom {
+            position: absolute;
+            bottom: var(--KanbanRecord-gap-v);
+            left: var(--KanbanRecord-gap-v);
+            right: var(--KanbanRecord-gap-v);
+
+            .oe_kanban_bottom {
+                &_left, &_right {
+                    position: absolute;
+                    bottom: 0;
+                }
+
+                &_left {
+                    left: 0;
+                }
+
+                &_right {
+                    right: 0;
+                }
+            }
+        }
+
+    }
+}

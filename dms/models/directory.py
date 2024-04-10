@@ -10,12 +10,10 @@ from ast import literal_eval
 from collections import defaultdict
 
 from odoo import _, api, fields, models, tools
+from odoo.addons.http_routing.models.ir_http import slugify
 from odoo.exceptions import UserError, ValidationError
 from odoo.osv.expression import AND, OR
 from odoo.tools import consteq, human_size
-
-from odoo.addons.http_routing.models.ir_http import slugify
-
 from ..tools.file import check_name, unique_name
 
 _logger = logging.getLogger(__name__)
@@ -42,28 +40,37 @@ class DmsDirectory(models.Model):
     _parent_name = "parent_id"
     _directory_field = _parent_name
 
-    parent_path = fields.Char(index="btree", unaccent=False)
+    def _default_parent_id(self):
+        context = self.env.context
+        if context.get("active_model") == self._name and context.get("active_id"):
+            return context["active_id"]
+        else:
+            return False
+
+    parent_path = fields.Char(
+        index="btree",
+        unaccent=False
+    )
     is_root_directory = fields.Boolean(
         default=False,
         help="""Indicates if the directory is a root directory.
         A root directory has a settings object, while a directory with a set
         parent inherits the settings form its parent.""",
     )
-
-    # Override acording to defined in AbstractDmsMixin
+    # Override according to defined in AbstractDmsMixin
     storage_id = fields.Many2one(
+        string="Storage",
         compute="_compute_storage_id",
         compute_sudo=True,
         readonly=False,
         comodel_name="dms.storage",
-        string="Storage",
         ondelete="restrict",
         auto_join=True,
         store=True,
     )
     parent_id = fields.Many2one(
-        comodel_name="dms.directory",
         string="Parent Directory",
+        comodel_name="dms.directory",
         domain="[('permission_create', '=', True)]",
         ondelete="restrict",
         # Access to a directory doesn't necessarily mean access its parent, so
@@ -76,18 +83,12 @@ class DmsDirectory(models.Model):
         copy=True,
         default=lambda self: self._default_parent_id(),
     )
-
     root_directory_id = fields.Many2one(
-        "dms.directory", "Root Directory", compute="_compute_root_id", store=True
+        string="Root Directory",
+        comodel_name="dms.directory",
+        compute="_compute_root_id",
+        store=True
     )
-
-    def _default_parent_id(self):
-        context = self.env.context
-        if context.get("active_model") == self._name and context.get("active_id"):
-            return context["active_id"]
-        else:
-            return False
-
     group_ids = fields.Many2many(
         comodel_name="dms.access.group",
         relation="dms_directory_groups_rel",
@@ -108,17 +109,20 @@ class DmsDirectory(models.Model):
         recursive=True,
     )
     complete_name = fields.Char(
-        compute="_compute_complete_name", store=True, recursive=True
+        string="Complete Name",
+        compute="_compute_complete_name",
+        store=True,
+        recursive=True
     )
     child_directory_ids = fields.One2many(
+        string="Subdirectories",
         comodel_name="dms.directory",
         inverse_name="parent_id",
-        string="Subdirectories",
         auto_join=False,
         copy=False,
     )
-
     tag_ids = fields.Many2many(
+        string="Tags",
         comodel_name="dms.tag",
         relation="dms_directory_tag_rel",
         domain="""[
@@ -127,12 +131,10 @@ class DmsDirectory(models.Model):
         """,
         column1="did",
         column2="tid",
-        string="Tags",
         compute="_compute_tags",
         readonly=False,
         store=True,
     )
-
     user_star_ids = fields.Many2many(
         comodel_name="res.users",
         relation="dms_directory_star_rel",
@@ -140,62 +142,66 @@ class DmsDirectory(models.Model):
         column2="uid",
         string="Stars",
     )
-
     starred = fields.Boolean(
         compute="_compute_starred",
         inverse="_inverse_starred",
         search="_search_starred",
     )
-
     file_ids = fields.One2many(
+        string="Files",
         comodel_name="dms.file",
         inverse_name="directory_id",
-        string="Files",
         auto_join=False,
         copy=False,
     )
-
     count_directories = fields.Integer(
-        compute="_compute_count_directories", string="Count Subdirectories Title"
+        string="Count Subdirectories Title",
+        compute="_compute_count_directories"
     )
-
     count_files = fields.Integer(
-        compute="_compute_count_files", string="Count Files Title"
+        string="Count Files Title",
+        compute="_compute_count_files"
     )
-
     count_directories_title = fields.Char(
-        compute="_compute_count_directories", string="Count Subdirectories"
+        string="Count Subdirectories",
+        compute="_compute_count_directories"
     )
-
     count_files_title = fields.Char(
-        compute="_compute_count_files", string="Count Files"
+        string="Count Files",
+        compute="_compute_count_files"
     )
-
-    count_elements = fields.Integer(compute="_compute_count_elements")
-
+    count_elements = fields.Integer(
+        compute="_compute_count_elements"
+    )
     count_total_directories = fields.Integer(
-        compute="_compute_count_total_directories", string="Total Subdirectories"
+        string="Total Subdirectories",
+        compute="_compute_count_total_directories"
     )
-
     count_total_files = fields.Integer(
-        compute="_compute_count_total_files", string="Total Files"
+        string="Total Files",
+        compute="_compute_count_total_files"
     )
-
     count_total_elements = fields.Integer(
-        compute="_compute_count_total_elements", string="Total Elements"
+        string="Total Elements",
+        compute="_compute_count_total_elements"
     )
-
-    size = fields.Float(compute="_compute_size")
-    human_size = fields.Char(compute="_compute_human_size", string="Size")
-
-    inherit_group_ids = fields.Boolean(string="Inherit Groups", default=True)
-
+    size = fields.Float(
+        compute="_compute_size"
+    )
+    human_size = fields.Char(
+        string="Size",
+        compute="_compute_human_size"
+    )
+    inherit_group_ids = fields.Boolean(
+        string="Inherit Groups",
+        default=True
+    )
     alias_process = fields.Selection(
+        string="Unpack Emails as",
         selection=[("files", "Single Files"), ("directory", "Subdirectory")],
         required=True,
         default="directory",
-        string="Unpack Emails as",
-        help="""\
+        help="""
                 Define how incoming emails are processed:\n
                 - Single Files: The email gets attached to the directory and
                 all attachments are created as files.\n
@@ -231,7 +237,7 @@ class DmsDirectory(models.Model):
     def _compute_access_url(self):
         res = super()._compute_access_url()
         for item in self:
-            item.access_url = "/my/dms/directory/%s" % (item.id)
+            item.access_url = "/my/dms/directory/%s" % item.id
         return res
 
     def check_access_token(self, access_token=False):
@@ -330,22 +336,13 @@ class DmsDirectory(models.Model):
         for record in self:
             record.res_model = record.model_id.model
 
-    def name_get(self):
-        if not self.env.context.get("directory_short_name", False):
-            return super().name_get()
-        vals = []
-        for record in self:
-            vals.append(tuple([record.id, record.name]))
-        return vals
-
     def toggle_starred(self):
         updates = defaultdict(set)
         for record in self:
             vals = {"starred": not record.starred}
             updates[tools.frozendict(vals)].add(record.id)
-        with self.env.norecompute():
-            for vals, ids in updates.items():
-                self.browse(ids).write(dict(vals))
+        for vals, ids in updates.items():
+            self.browse(ids).write(dict(vals))
         self.flush_recordset()
 
     # ----------------------------------------------------------
@@ -591,15 +588,10 @@ class DmsDirectory(models.Model):
             if self.env.context.get("check_name", True) and not check_name(record.name):
                 raise ValidationError(_("The directory name is invalid."))
             if record.is_root_directory:
-                childs = record.sudo().storage_id.root_directory_ids.name_get()
+                childs = record.sudo().storage_id.root_directory_ids
             else:
-                childs = record.sudo().parent_id.child_directory_ids.name_get()
-            if list(
-                filter(
-                    lambda child: child[1] == record.name and child[0] != record.id,
-                    childs,
-                )
-            ):
+                childs = record.sudo().parent_id.child_directory_ids
+            if childs.filtered(lambda child: child.name == record.name and child != record):
                 raise ValidationError(
                     _("A directory with the same name already exists.")
                 )
@@ -715,11 +707,10 @@ class DmsDirectory(models.Model):
                     raise UserError(_("It is not possible to change the storage."))
         # Groups part
         if any(key in vals for key in ["group_ids", "inherit_group_ids"]):
-            with self.env.norecompute():
-                res = super(DmsDirectory, self).write(vals)
-                domain = [("id", "child_of", self.ids)]
-                records = self.sudo().search(domain)
-                records.modified(["group_ids"])
+            res = super().write(vals)
+            domain = [("id", "child_of", self.ids)]
+            records = self.sudo().search(domain)
+            records.modified(["group_ids"])
             records.flush_recordset()
         else:
             res = super().write(vals)

@@ -7,7 +7,7 @@ import {useService} from "@web/core/utils/hooks";
 export class PreviewRecordField extends BinaryField {
     setup() {
         super.setup();
-        this.messaging = useService("messaging");
+        this.messaging = useService("mail.messaging");
         this.dialog = useService("dialog");
     }
 
@@ -27,9 +27,15 @@ export class PreviewRecordField extends BinaryField {
                 attachmentListOwnerAsAttachmentView: attachmentList,
             });
         });
-        return;
     }
 }
 
 PreviewRecordField.template = "dms.FilePreviewField";
-registry.category("fields").add("preview_binary", PreviewRecordField);
+
+const previewRecordField = {
+    component: PreviewRecordField,
+    dependencies: [BinaryField],
+    display_name: "Preview Record",
+    supportedTypes: ["binary"],
+}
+registry.category("fields").add("preview_binary", previewRecordField);

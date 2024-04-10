@@ -162,7 +162,7 @@ class DmsSecurityMixin(models.AbstractModel):
             WHERE
                 users.uid = %s {operation_check}
             """
-        return (select, (self.env.uid,))
+        return select, (self.env.uid,)
 
     @api.model
     def _get_domain_by_access_groups(self, operation):
